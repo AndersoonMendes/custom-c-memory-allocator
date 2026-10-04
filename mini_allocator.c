@@ -29,9 +29,20 @@ void* my_malloc(size_t size_desired){
 
     while (atual != NULL){
         if(atual->free && atual->size >= size_desired){
+
+            if(atual->size >= size_desired + sizeof(Header) + 8){ // Verify if has space for more one
+                Header *new_block = (Header*)((uint8_t*)atual + sizeof(Header) + size_desired); // Adress of new block
+                new_block->size = atual->size - size_desired - sizeof(Header); //1012 - 20 - 12
+                new_block->free = 1;
+                new_block->next = atual->next;
+
+                atual->size = size_desired; // Reajusta o tamanho de 1012 para 20 bytes
+                atual->next = new_block;
+
+            }
             atual->free = 0;
 
-            return (void*)(uint8_t*)atual + sizeof(Header);
+            return (void*)((uint8_t*)atual + sizeof(Header));
         }
 
         atual = atual->next;
@@ -45,11 +56,13 @@ int main(){
     int *p1 = (int*) my_malloc(5*sizeof(int)); // 20 bytes
 
     printf("Total RAM, available: %d bytes\n", SIZE_HEAP);
+
     printf("Header size: %zu bytes\n", sizeof(Header));
     
     printf("Adress initial of Heap simmuled: %p\n", (void*)init_heap);    
     printf("p1 adress: %p\n", (void*)p1);
-    printf("Space available: %zu bytes\n", init_heap->size);
-    printf("Header size: by calculus: %d bytes\n", (int)(((void*)p1 - (void*)init_heap)));
+    
+    printf("Space available: %zu bytes\n", init_heap->next->size);
+
     return 0;
 }
