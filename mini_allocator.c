@@ -98,7 +98,7 @@ int main(){
     my_free(p1);
     my_free(p2);
 
-    inspect_heap("4. After freeing the memory (coalescing)");
+    inspect_heap("3. After freeing the memory (coalescing)");
 
     return 0;
 }
